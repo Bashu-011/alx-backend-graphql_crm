@@ -1,15 +1,14 @@
 import graphene
-from crm.schema import Query as CRMQuery, Mutation as CRMMutation
+from graphene_django.types import DjangoObjectType
+from crm.models import Product 
 
-class Query(CRMQuery, graphene.ObjectType):
-    hello = graphene.String(default_value="Hello, GraphQL!")
-    pass
+#productType for returning product data
+class ProductType(DjangoObjectType):
+    class Meta:
+        model = Product
+        fields = ("id", "name", "stock")
 
-class Mutation(CRMMutation, graphene.ObjectType):
-    pass
-
-schema = graphene.Schema(query=Query)
-
+#update low stock products
 class UpdateLowStockProducts(graphene.Mutation):
     class Arguments:
         pass
@@ -22,7 +21,7 @@ class UpdateLowStockProducts(graphene.Mutation):
         updated_products = []
 
         for product in low_stock_products:
-            product.stock += 10  #restocking
+            product.stock += 10  # restock by 10
             product.save()
             updated_products.append(product)
 
@@ -30,9 +29,12 @@ class UpdateLowStockProducts(graphene.Mutation):
         return UpdateLowStockProducts(success=message, updated_products=updated_products)
 
 
+class Query(graphene.ObjectType):
+    hello = graphene.String(default_value="Hello, GraphQL!")
+
+
 class Mutation(graphene.ObjectType):
     update_low_stock_products = UpdateLowStockProducts.Field()
 
-#schema includes mutation
-schema = graphene.Schema(mutation=Mutation)
 
+schema = graphene.Schema(query=Query, mutation=Mutation)
