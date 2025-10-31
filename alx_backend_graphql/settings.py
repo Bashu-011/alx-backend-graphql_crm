@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'crm',
     'graphene_django',
     'django_filters',
-    'django-crontab'
+    'django_crontab'
 ]
 
 CRONJOBS = [
